@@ -30,15 +30,14 @@ This Pwnagotchi plugin automatically uploads WPA/WPA2 `.pcap` handshakes to [Onl
    Ensure `hcxpcapngtool` is available at `/usr/bin/hcxpcapngtool`.
 
 2. **Plugin Setup:**
-   - Place the plugin Python file (e.g., `onlinehashcrack.py`) into the `plugins/` directory of your Pwnagotchi.
+   - Place the plugin Python file (e.g., `ohcapi.py`) into the `plugins/` directory of your Pwnagotchi.
 
 3. **Configuration:**
    Edit your `config.toml` and add the plugin:
    ```toml
-   main.plugins.onlinehashcrack.enabled = true
-   main.plugins.onlinehashcrack.api_key = "sk_your_api_key_here"
-   main.plugins.onlinehashcrack.receive_email = "yes"
-   # Additional configuration as needed
+   main.plugins.ohcapi.enabled = true
+   main.plugins.ohcapi.api_key = "sk_your_api_key_here"
+   main.plugins.ohcapi.receive_email = "yes"
    ```
 
 ## Usage
