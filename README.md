@@ -1,7 +1,3 @@
-Below is an example of a GitHub README file for the plugin. Adjust details, wording, and formatting as needed.
-
----
-
 # OnlineHashCrack WPA/WPA2 Handshake Upload Plugin
 
 This Pwnagotchi plugin automatically uploads WPA/WPA2 `.pcap` handshakes to [OnlineHashCrack.com](https://onlinehashcrack.com) using their new V2 API. It collects newly captured `.pcap` files, extracts hash lines in hashcat 22000 format using `hcxpcapngtool`, and sends them to the OnlineHashCrack API. The plugin also:
@@ -78,7 +74,3 @@ Pull requests and issues are welcome. If you find a bug or have an improvement, 
 ## License
 
 This plugin is released under the GPLv3 license. See the [LICENSE](LICENSE) file for more details.
-
----
-
-**Note:** This README assumes certain API functionality and plugin file names. Adjust as needed for your actual filenames, directories, configuration keys, and API details.
