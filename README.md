@@ -49,15 +49,6 @@ This Pwnagotchi plugin automatically uploads WPA/WPA2 `.pcap` handshakes to [Onl
   - All new `.pcap` files are processed.
   - New hashes are uploaded to OnlineHashCrack in batches of 50.
   - If successful, these `.pcap` files are marked as reported and their `(ESSID, BSSID)` is recorded.
-- If any tasks are found cracked (`status = Found`), their passwords are written to `remote_cracking.potfile`.
-
-## Potfile
-
-Cracked passwords are appended to `remote_cracking.potfile` in the `handshakes` directory. The lines are formatted as:
-```
-/path/to/filename.pcap:password
-```
-This makes it easy to correlate recovered passwords with their original `.pcap` file.
 
 ## Troubleshooting
 
