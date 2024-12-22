@@ -82,6 +82,28 @@ class ohcapi(plugins.Plugin):
             self._run_tasks(agent)
             self.last_run = current_time
 
+    def _extract_essid_bssid_from_hash(self, hash_line):
+        parts = hash_line.strip().split('*')
+        essid = 'unknown_ESSID'
+        bssid = '00:00:00:00:00:00'
+
+        if len(parts) > 5:
+            essid_hex = parts[5]
+            try:
+                essid = bytes.fromhex(essid_hex).decode('utf-8', errors='replace')
+            except:
+                essid = 'unknown_ESSID'
+
+        if len(parts) > 3:
+            apmac = parts[3]
+            if len(apmac) == 12:
+                bssid = ':'.join(apmac[i:i+2] for i in range(0, 12, 2))
+                
+        if essid == 'unknown_ESSID' or bssid == '00:00:00:00:00:00':
+            logging.debug(f"OHC NewAPI: Failed to extract ESSID/BSSID from hash -> {hash_line}")
+
+        return essid, bssid
+
     def _run_tasks(self, agent):
         """
         Encapsulates the logic of extracting, uploading, and updating tasks.
