@@ -10,7 +10,7 @@ from json.decoder import JSONDecodeError
 
 class ohcapi(plugins.Plugin):
     __author__ = 'Rohan Dayaram'
-    __version__ = '1.0.3'
+    __version__ = '1.0.4'
     __license__ = 'GPL3'
     __description__ = 'Uploads WPA/WPA2 handshakes to OnlineHashCrack.com using the new API (V2), no dashboard.'
 
@@ -18,10 +18,11 @@ class ohcapi(plugins.Plugin):
         self.ready = False
         self.lock = Lock()
         try:
-            self.report = StatusFile('/root/handshakes/.ohc_uploads', data_format='json')
+            self.report = StatusFile('/home/pi/handshakes/.ohc_uploads', data_format='json')
         except JSONDecodeError:
-            os.remove('/root/.ohc_newapi_uploads')
-            self.report = StatusFile('/root/handshakes/.ohc_uploads', data_format='json')
+            os.remove('/home/pi/handshakes/.ohc_uploads')
+            self.report = StatusFile('/home/pi/handshakes/.ohc_uploads', data_format='json')
+        self.skip_file = '/home/pi/handshakes/.ohc_skip'
         self.skip = list()
         self.last_run = 0  # Track last time periodic tasks were run
         self.internet_active = False  # Track whether internet is currently available
@@ -41,6 +42,12 @@ class ohcapi(plugins.Plugin):
             
         if 'sleep' not in self.options:
             self.options['sleep'] = 60*60  # default to 1 hour
+            
+        # read skipped files
+        if os.path.exists(self.skip_file):
+            with open(self.skip_file, 'r') as f:
+                self.skip = f.readlines()
+                self.skip = [s.strip() for s in self.skip]
 
         self.ready = True
         logging.info("OHC NewAPI: Plugin loaded and ready.")
@@ -149,13 +156,19 @@ class ohcapi(plugins.Plugin):
                     else:
                         logging.debug(f"OHC NewAPI: No hashes extracted from {pcap_path}, skipping.")
                         self.skip.append(pcap_path)
+                        
+                # write skipped files and avoid duplicates
+                self.skip = list(set(self.skip))
+                with open(self.skip_file, 'w') as f:
+                    f.write('\n'.join(self.skip))
 
                 # Now upload all extracted hashes
                 if all_hashes:
-                    batches = [all_hashes[i:i+50] for i in range(0, len(all_hashes), 50)]
+                    total_hashes = len(all_hashes)
+                    batches = [all_hashes[i:i+50] for i in range(0, total_hashes, 50)]
                     upload_success = True
                     for batch_idx, batch in enumerate(batches):
-                        display.on_uploading(f"onlinehashcrack.com ({(batch_idx+1)*50}/{len(all_hashes)})")
+                        display.on_uploading(f"onlinehashcrack.com ({min((batch_idx+1) * 50, total_hashes)}/{total_hashes})")
                         if not self._add_tasks(batch):
                             upload_success = False
                             break
@@ -175,7 +188,6 @@ class ohcapi(plugins.Plugin):
                         logging.debug("OHC NewAPI: Failed to upload tasks, added to skip list.")
                 else:
                     logging.debug("OHC NewAPI: No hashes were extracted from the new pcaps. Nothing to upload.")
-
                 display.on_normal()
             else:
                 logging.debug("OHC NewAPI: No new PCAP files to process.")
